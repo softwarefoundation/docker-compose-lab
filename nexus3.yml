@@ -1,0 +1,28 @@
+# docker-compose -f nexus3.yml -p sonar3-set up
+#
+# Durante a inicialização uma pasta docker-volumes 
+# será criada no mesmo local do arquivo nexus.yml
+#
+# Senha: docker-volumes/admin.password
+
+
+version: "3.7"
+
+services:
+  nexus:
+    container_name: NEXUS3
+    image: sonatype/nexus3
+    expose:
+      - 5021
+      - 5022
+      - 5023
+    ports:
+      - "5021:8081"
+      - "5022:8082"
+      - "5023:8083"
+    volumes:
+      - ./docker-volumes:/nexus-data
+    restart: always
+
+volumes:
+  docker-volumes:
