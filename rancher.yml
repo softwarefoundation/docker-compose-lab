@@ -1,0 +1,18 @@
+# docker-compose -f rancher.yml -p rancher-set up
+
+version: "3.7"
+
+services:
+  rancher:
+    container_name: RANCHER
+    image: rancher/rancher:stable
+    privileged: true
+    expose:
+      - 443
+      - 80
+    ports:
+      - "4443:443"
+      - "8880:80"
+    volumes:
+      - /opt/rancher:/var/lib/rancher
+    restart: always
