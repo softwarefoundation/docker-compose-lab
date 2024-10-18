@@ -1,0 +1,50 @@
+# docker-compose -f sonarqube.yml -p sonarqube-set up
+
+version: "3"
+
+services:
+  pg-sonar:
+    container_name: POSTGRES_SONARQUBE
+    image: postgres:9.6
+    networks:
+      - sonarnet
+    environment:
+      - POSTGRES_DB=sonar
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
+  sonarqube:
+    container_name: SONARQUBE
+    image: sonarqube:lts
+    ports:
+      - 9000:9000
+    networks:
+      - sonarnet
+    environment:
+      - sonar.jdbc.url=jdbc:postgresql://pg-sonar:5432/sonar
+      - SONAR_FORCEAUTHENTICATION=false
+      - sonar.login=sonar
+      - sonar.password=sonar
+    depends_on:
+      - pg-sonar
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+
+networks:
+  sonarnet:
+
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonarqube_bundled-plugins:
+  postgresql:
+  postgresql_data:
