@@ -1,4 +1,5 @@
-# docker-compose -f sonarqube.yml -p sonarqube-set up
+# docker-compose -f sonarqube.yml -p sonarqube-set up -d
+# credenciais Administrator usuário:admin  senha:admin
 
 version: "3"
 
