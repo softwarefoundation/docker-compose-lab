@@ -1,0 +1,43 @@
+# docker-compose -f keycloak-federation-openldap-ufmt.yml -p keycloak-federation-openldap-ufmt-set up -d
+
+version: '3'
+services:
+  openldap:
+    image: osixia/openldap:latest
+    container_name: openldap-ufmt
+    environment:
+      - LDAP_ORGANISATION=Universidade Federal de Mato Grosso
+      - LDAP_DOMAIN=ufmt.br
+      - LDAP_ADMIN_PASSWORD=admin
+    ports:
+      - "389:389"
+      - "636:636"
+    volumes:
+      - ldap_data:/var/lib/ldap
+    restart: always
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin-ufmt
+    depends_on:
+      - openldap
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=openldap
+    ports:
+      - "8089:80"
+      - "6443:443"
+    restart: always
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    container_name: keycloak-ufmt
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8088:8080"
+    restart: always
+
+volumes:
+  ldap_data:
