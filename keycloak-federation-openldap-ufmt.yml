@@ -8,7 +8,13 @@ services:
     environment:
       - LDAP_ORGANISATION=Universidade Federal de Mato Grosso
       - LDAP_DOMAIN=ufmt.br
+      - LDAP_ADMIN_USERNAME=admin
       - LDAP_ADMIN_PASSWORD=admin
+      - LDAP_CONFIG_PASSWORD=admin
+      - "LDAP_BASE_DN=dc=ufmt,dc=br"
+      - LDAP_READONLY_USER=true
+      - LDAP_READONLY_USER_USERNAME=readonly
+      - LDAP_READONLY_USER_PASSWORD=readonly
     ports:
       - "389:389"
       - "636:636"
