@@ -1,6 +1,6 @@
 # docker-compose -f keycloak-federation-openldap-ufmt.yml -p keycloak-federation-openldap-ufmt-set up -d
 
-version: '3'
+#version: '3.8'
 services:
   openldap:
     image: osixia/openldap:latest
@@ -19,8 +19,11 @@ services:
       - "389:389"
       - "636:636"
     volumes:
-      - ldap_data:/var/lib/ldap
+      - ldap_data_keycloak_federation:/var/lib/ldap
+      - ldap_config_keycloak_federation:/etc/ldap/slapd.d
     restart: always
+    networks:
+      - network_keycloak_federation
 
   phpldapadmin:
     image: osixia/phpldapadmin:latest
@@ -33,6 +36,19 @@ services:
       - "8089:80"
       - "6443:443"
     restart: always
+    networks:
+      - network_keycloak_federation
+
+  postgres:
+    image: postgres:16.2
+    volumes:
+      - postgres_data_keycloak_federation:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - network_keycloak_federation
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.7
@@ -41,9 +57,27 @@ services:
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres/keycloak
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=postgres
     ports:
       - "8088:8080"
     restart: always
+    depends_on:
+      - postgres
+      - openldap
+    networks:
+      - network_keycloak_federation
 
 volumes:
-  ldap_data:
+  postgres_data_keycloak_federation:
+    driver: local
+  ldap_data_keycloak_federation:
+    driver: local
+  ldap_config_keycloak_federation:
+    driver: local
+
+networks:
+  network_keycloak_federation:
+    driver: bridge
